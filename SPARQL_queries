@@ -1,9 +1,8 @@
 ##### Put all SPARQL queries here
 
 ### Selects all Parkinson's drugs that interact with at least one of the five dopamine receptors
-SELECT ?item ?itemLabel
+SELECT ?item ?itemLabel ?filterLabel ?roleLabel ?role
 WHERE {
-  ?item wdt:P2175 wd:Q11085.
   VALUES ?filter {
   wd:Q21110867
   wd:Q2034004
@@ -11,8 +10,8 @@ WHERE {
   wd:Q308856
   wd:Q21131500}.
   FILTER EXISTS {?item wdt:P129 ?filter.}.
+  ?item wdt:P2175 ?role.
+  FILTER(?role = wd:Q11085).
   
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en".}
   }
-LIMIT 50
-
