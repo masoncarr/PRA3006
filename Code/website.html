@@ -52,6 +52,7 @@
             font-size: 14px;
             box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
         }
+
     </style>
 </head>
 
@@ -61,9 +62,7 @@
 
 <p>Authors: Renee Carr, Léa Kremers, Sophie Parsons, Anna Pihlakas</p>
 
-<p>We dived into WikiData and made a query to see what drugs are used to treat Parkinson's disease,
-    while filtering out drugs that affect the Dopamine receptors. </p>
-
+<p>We dived into WikiData and made a query to see what drugs are used to treat Parkinson's disease, while filtering out drugs that affect the Dopamine receptors.</p>
 
 <div id="network" class="loading"> </div>
 
@@ -73,20 +72,23 @@
     document.addEventListener("DOMContentLoaded", () => {
         const sparqlEndpoint = "https://query.wikidata.org/sparql";
         const sparqlQuery = `
-SELECT ?item ?itemLabel ?filterLabel ?roleLabel
+SELECT ?item ?itemLabel ?receptorLabel ?roleLabel ?role ?diseaseLabel
 WHERE {
-  VALUES ?filter {
-    wd:Q21110867
-    wd:Q2034004
-    wd:Q21110872
-    wd:Q308856
-    wd:Q21131500
-  }.
-  FILTER EXISTS {?item wdt:P129 ?filter.}.
-  ?item wdt:P2175 ?role.
-  FILTER(?role = wd:Q11085).
+  VALUES ?receptor {
+  wd:Q21110867
+  wd:Q2034004
+  wd:Q21110872
+  wd:Q308856
+  wd:Q21131500}.
+  FILTER EXISTS {?item wdt:P129 ?receptor.}.
+  VALUES ?role {
+  wd:Q600203
+  wd:Q3271533}.
+  ?item wdt:P2868 ?role.
+  ?item wdt:P2175 ?disease.
+  FILTER(?disease = wd:Q11085).
 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en".}
 }`;
 
         fetch(`${sparqlEndpoint}?query=${encodeURIComponent(sparqlQuery)}`, {
@@ -106,16 +108,34 @@ WHERE {
 
                 results.forEach(result => {
                     const drug = result.itemLabel?.value || 'Unknown Drug';
-                    const receptor = result.filterLabel?.value || 'Unknown Receptor';
+                    const receptor = result.receptorLabel?.value || 'Unknown Receptor';
+                    const role = result.roleLabel?.value || 'Unknown Role';
+                    const disease = result.diseaseLabel?.value || 'Parkinson\'s Disease';
 
+                    // Add drug node
                     if (!nodes.find(node => node.id === drug)) {
                         nodes.push({ id: drug, group: 1 });
                     }
+
+                    // Add receptor node
                     if (!nodes.find(node => node.id === receptor)) {
                         nodes.push({ id: receptor, group: 2 });
                     }
 
-                    links.push({ source: drug, target: receptor });
+                    // Add role node
+                    if (role && !nodes.find(node => node.id === role)) {
+                        nodes.push({ id: role, group: 3 });
+                    }
+
+                    // Add disease node
+                    if (disease && !nodes.find(node => node.id === disease)) {
+                        nodes.push({ id: disease, group: 4 });
+                    }
+
+                    // Add links
+                    links.push({ source: disease, target: role, type: 'affects' });
+                    links.push({ source: role, target: drug, type: 'has role' });
+                    links.push({ source: drug, target: receptor, type: 'treats' });
                 });
 
                 createInteractiveNetwork(nodes, links);
@@ -184,10 +204,15 @@ WHERE {
 
             node.append("circle")
                 .attr("r", 10)
-                .attr("fill", d => d.group === 1 ? "#ff6347" : "#4682b4")
+                .attr("fill", d => {
+                    if (d.group === 1) return "#ff6347";  // Drug nodes
+                    if (d.group === 2) return "#4682b4";  // Receptor nodes
+                    if (d.group === 3) return "#E777E0";  // Role nodes
+                    return "#ffd700";  // Disease nodes
+                })
                 .on("mouseover", (event, d) => {
                     tooltip.style("opacity", 1)
-                        .text(d.id)
+                        .html(`<strong>${d.id}</strong>`)
                         .style("left", (event.pageX + 10) + "px")
                         .style("top", (event.pageY - 10) + "px");
                 })
