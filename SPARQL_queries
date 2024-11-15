@@ -18,20 +18,23 @@ WHERE {
 
 ### Query version 2, differentiates agonist and antagonist
 
-SELECT ?item ?itemLabel ?filterLabel ?roleLabel ?role
+SELECT ?item ?itemLabel ?receptorLabel ?roleLabel ?role ?diseaseLabel
 WHERE {
-  VALUES ?filter {
+  VALUES ?receptor {
   wd:Q21110867
   wd:Q2034004
   wd:Q21110872
   wd:Q308856
   wd:Q21131500}.
-  FILTER EXISTS {?item wdt:P129 ?filter.}.
+  FILTER EXISTS {?item wdt:P129 ?receptor.}.
   VALUES ?role {
   wd:Q600203
   wd:Q3271533}.
   ?item wdt:P2868 ?role.
-  ?item wdt:P2175 wd:Q11085.
+  ?item wdt:P2175 ?disease.
+  FILTER(?disease = wd:Q11085).
+
+
 
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en".}
   }
