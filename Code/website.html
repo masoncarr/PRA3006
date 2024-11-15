@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dopaminergic Dynamics</title>
+    <style>
+        body {
+            background-color: whitesmoke;
+        }
+
+        h1 {
+            color: black;
+            text-align: left;
+        }
+
+        p1 {
+            font-weight: bold;
+            font-style: normal;
+            font-size: 20px;
+        }
+        p {
+            font-family: verdana;
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body>
+
+  <h1>Dopaminergic Pathways of the Drugs used to Treat Parkinson's Disease</h1>
+
+  <p1>Authors: Renee Carr, Léa Kremers, Sophie Parsons, Anna Pihlakas</p1>
+
+  <p>We dived into WikiData and made a query to see what drugs are used to treat Parkinson's disease,
+  while filtering out drugs that affect the Dopamine receptors. </p>
+
+  <p>Here is what our SPARQL query looks like:</p>
+  <img src="query.jpg" alt="SPARQL query for WikiData" width="900" height="300">
+
+<script>
+  const sparqlEndpoint = "https://sparql.wikipathways.org/sparql";
+  const sparqlQuery = `
+SELECT ?item ?itemLabel ?receptorLabel ?roleLabel ?role ?diseaseLabel
+WHERE {
+  VALUES ?receptor {
+  wd:Q21110867
+  wd:Q2034004
+  wd:Q21110872
+  wd:Q308856
+  wd:Q21131500}.
+  FILTER EXISTS {?item wdt:P129 ?receptor.}.
+  VALUES ?role {
+  wd:Q600203
+  wd:Q3271533}.
+  ?item wdt:P2868 ?role.
+  ?item wdt:P2175 ?disease.
+  FILTER(?disease = wd:Q11085).
+
+
+
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en".}
+  }
+
+  `;
+
+
+
+  </script>
+  </body>
+  </html>
