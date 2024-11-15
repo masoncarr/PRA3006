@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <title>Dopaminergic Dynamics</title>
+    <title>Dopaminergic Dynamics - Interactive Network</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
         body {
             background-color: whitesmoke;
+            font-family: Verdana, sans-serif;
         }
 
         h1 {
@@ -15,58 +16,203 @@
             text-align: left;
         }
 
-        p1 {
-            font-weight: bold;
-            font-style: normal;
-            font-size: 20px;
+        #network {
+            width: 100%;
+            height: 90vh;
+            border: 1px solid #ccc;
         }
-        p {
-            font-family: verdana;
-            font-size: 18px;
+
+        .node circle {
+            stroke: #fff;
+            stroke-width: 1.5px;
+        }
+
+        .node text {
+            font-size: 12px;
+            pointer-events: none;
+        }
+
+        .link {
+            stroke: #999;
+            stroke-opacity: 0.6;
+        }
+
+        .loading {
+            font-style: italic;
+            color: gray;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: white;
+            border: 1px solid gray;
+            padding: 5px;
+            border-radius: 4px;
+            pointer-events: none;
+            font-size: 14px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
 
 <body>
 
-  <h1>Dopaminergic Pathways of the Drugs used to Treat Parkinson's Disease</h1>
+<h1>Dopaminergic Pathways of the Drugs used to Treat Parkinson's Disease</h1>
 
-  <p1>Authors: Renee Carr, Léa Kremers, Sophie Parsons, Anna Pihlakas</p1>
+<p>Authors: Renee Carr, Léa Kremers, Sophie Parsons, Anna Pihlakas</p>
 
-  <p>We dived into WikiData and made a query to see what drugs are used to treat Parkinson's disease,
-  while filtering out drugs that affect the Dopamine receptors. </p>
+<p>We dived into WikiData and made a query to see what drugs are used to treat Parkinson's disease,
+    while filtering out drugs that affect the Dopamine receptors. </p>
 
-  <p>Here is what our SPARQL query looks like:</p>
-  <img src="query.jpg" alt="SPARQL query for WikiData" width="900" height="300">
+
+<div id="network" class="loading"> </div>
+
+<div class="tooltip" style="opacity: 0;"></div>
 
 <script>
-  const sparqlEndpoint = "https://sparql.wikipathways.org/sparql";
-  const sparqlQuery = `
-SELECT ?item ?itemLabel ?receptorLabel ?roleLabel ?role ?diseaseLabel
+    document.addEventListener("DOMContentLoaded", () => {
+        const sparqlEndpoint = "https://query.wikidata.org/sparql";
+        const sparqlQuery = `
+SELECT ?item ?itemLabel ?filterLabel ?roleLabel
 WHERE {
-  VALUES ?receptor {
-  wd:Q21110867
-  wd:Q2034004
-  wd:Q21110872
-  wd:Q308856
-  wd:Q21131500}.
-  FILTER EXISTS {?item wdt:P129 ?receptor.}.
-  VALUES ?role {
-  wd:Q600203
-  wd:Q3271533}.
-  ?item wdt:P2868 ?role.
-  ?item wdt:P2175 ?disease.
-  FILTER(?disease = wd:Q11085).
+  VALUES ?filter {
+    wd:Q21110867
+    wd:Q2034004
+    wd:Q21110872
+    wd:Q308856
+    wd:Q21131500
+  }.
+  FILTER EXISTS {?item wdt:P129 ?filter.}.
+  ?item wdt:P2175 ?role.
+  FILTER(?role = wd:Q11085).
 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
+}`;
 
+        fetch(`${sparqlEndpoint}?query=${encodeURIComponent(sparqlQuery)}`, {
+            headers: { 'Accept': 'application/json' }
+        })
+            .then(response => response.json())
+            .then(data => {
+                const results = data.results.bindings;
 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en".}
-  }
+                if (results.length === 0) {
+                    document.getElementById('network').textContent = 'No data available to display.';
+                    return;
+                }
 
-  `;
+                const nodes = [];
+                const links = [];
 
+                results.forEach(result => {
+                    const drug = result.itemLabel?.value || 'Unknown Drug';
+                    const receptor = result.filterLabel?.value || 'Unknown Receptor';
 
+                    if (!nodes.find(node => node.id === drug)) {
+                        nodes.push({ id: drug, group: 1 });
+                    }
+                    if (!nodes.find(node => node.id === receptor)) {
+                        nodes.push({ id: receptor, group: 2 });
+                    }
 
-  </script>
-  </body>
-  </html>
+                    links.push({ source: drug, target: receptor });
+                });
+
+                createInteractiveNetwork(nodes, links);
+            })
+            .catch(error => {
+                console.error('Error fetching SPARQL data:', error);
+                document.getElementById('network').textContent = 'Error loading data. Please try again later.';
+            });
+
+        function createInteractiveNetwork(nodes, links) {
+            const width = window.innerWidth;
+            const height = window.innerHeight * 0.9;
+
+            const svg = d3.select("#network")
+                .classed("loading", false)
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height);
+
+            const tooltip = d3.select(".tooltip");
+
+            const zoom = d3.zoom()
+                .scaleExtent([0.5, 5])
+                .on("zoom", (event) => {
+                    svgGroup.attr("transform", event.transform);
+                });
+
+            svg.call(zoom);
+
+            const svgGroup = svg.append("g");
+
+            const simulation = d3.forceSimulation(nodes)
+                .force("link", d3.forceLink(links).id(d => d.id).distance(150))
+                .force("charge", d3.forceManyBody().strength(-400))
+                .force("center", d3.forceCenter(width / 2, height / 2));
+
+            const link = svgGroup.append("g")
+                .attr("class", "links")
+                .selectAll("line")
+                .data(links)
+                .enter().append("line")
+                .attr("class", "link")
+                .style("stroke", "#aaa")
+                .style("stroke-width", 2);
+
+            const node = svgGroup.append("g")
+                .attr("class", "nodes")
+                .selectAll("g")
+                .data(nodes)
+                .enter().append("g")
+                .call(d3.drag()
+                    .on("start", (event, d) => {
+                        if (!event.active) simulation.alphaTarget(0.3).restart();
+                        d.fx = d.x;
+                        d.fy = d.y;
+                    })
+                    .on("drag", (event, d) => {
+                        d.fx = event.x;
+                        d.fy = event.y;
+                    })
+                    .on("end", (event, d) => {
+                        if (!event.active) simulation.alphaTarget(0);
+                        d.fx = null;
+                        d.fy = null;
+                    }));
+
+            node.append("circle")
+                .attr("r", 10)
+                .attr("fill", d => d.group === 1 ? "#ff6347" : "#4682b4")
+                .on("mouseover", (event, d) => {
+                    tooltip.style("opacity", 1)
+                        .text(d.id)
+                        .style("left", (event.pageX + 10) + "px")
+                        .style("top", (event.pageY - 10) + "px");
+                })
+                .on("mouseout", () => tooltip.style("opacity", 0));
+
+            node.append("text")
+                .text(d => d.id)
+                .attr("x", 12)
+                .attr("y", 3)
+                .style("font-size", "12px");
+
+            simulation.on("tick", () => {
+                link
+                    .attr("x1", d => d.source.x)
+                    .attr("y1", d => d.source.y)
+                    .attr("x2", d => d.target.x)
+                    .attr("y2", d => d.target.y);
+
+                node
+                    .attr("transform", d => `translate(${d.x},${d.y})`);
+            });
+        }
+    });
+</script>
+
+</body>
+
+</html>
