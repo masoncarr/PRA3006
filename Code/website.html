@@ -216,7 +216,20 @@ WHERE {
                         .style("left", (event.pageX + 10) + "px")
                         .style("top", (event.pageY - 10) + "px");
                 })
-                .on("mouseout", () => tooltip.style("opacity", 0));
+                .on("mouseout", () => tooltip.style("opacity", 0))
+                .on("click", (event, d) => {
+                    const selectedNodeId = d.id;
+                    // Highlight the links connected to the selected node and fade the others
+                    link.style("stroke-opacity", (l) => {
+                        return l.source.id === selectedNodeId || l.target.id === selectedNodeId ? 1 : 0.1;
+                    })
+                        .style("stroke", (l) => {
+                            return l.source.id === selectedNodeId || l.target.id === selectedNodeId ? "#D40073" : "#999";
+                        })
+                        .style("stroke-width", (l) => {
+                            return l.source.id === selectedNodeId || l.target.id === selectedNodeId ? 4 : 2;  // Thicker for highlighted links
+                        });
+                });
 
             node.append("text")
                 .text(d => d.id)
