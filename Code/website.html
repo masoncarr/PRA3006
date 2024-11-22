@@ -439,13 +439,6 @@ WHERE {
                             const isLinkToCounterpart = l.source.id === counterpartNodeId || l.target.id === counterpartNodeId;
                             return isLinkToSelected || isLinkToCounterpart ? 4 : 2;  // Thicker for highlighted links
                         });
-
-                    // If the selected node is an agonist or antagonist, highlight its counterpart
-                    if (counterpartNodeId) {
-                        node.selectAll("circle")
-                            .attr("stroke", (n) => n.id === counterpartNodeId ? "#D40073" : null)  // Highlight the counterpart
-                            .attr("stroke-width", (n) => n.id === counterpartNodeId ? 3 : null);  // Add border to counterpart
-                    }
                 });
 
             node.append("text")
