@@ -20,9 +20,10 @@
         }
 
         #network {
-            width: 100%;
+            width: 80%;
             height: 90vh;
             border: 1px solid #ccc;
+            display: inline-block;
         }
 
         .node circle {
@@ -126,6 +127,32 @@
             box-sizing: border-box;
             white-space: pre-wrap;
         }
+
+        /* Styling for the legend */
+        #legend {
+            display: inline-block;
+            vertical-align: top;
+            width: 15%;
+            height: 90vh;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            margin-left: 20px;
+            box-sizing: border-box;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%; /* This makes the legend icons circular */
+            margin-right: 10px;
+        }
     </style>
 </head>
 
@@ -163,6 +190,27 @@
 <textarea id="textbox1" readonly>Authors: Anna Pihlakas, Léa Kremers, Sophie Parsons, Renee Carr</textarea>
 
 <div id="network" class="loading"></div>
+
+<!-- Legend Section -->
+<div id="legend">
+    <h3>Legend</h3>
+    <div class="legend-item">
+        <div class="legend-color" style="background-color: #4682b4;"></div>
+        <span>Dopamine Receptors </span>
+    </div>
+    <div class="legend-item">
+        <div class="legend-color" style="background-color: #ff6347;"></div>
+        <span>Drugs Used </span>
+    </div>
+    <div class="legend-item">
+        <div class="legend-color" style="background-color: #E777E0;"></div>
+        <span>Antagonist/Agonist </span>
+    </div>
+    <div class="legend-item">
+        <div class="legend-color" style="background-color: #ffd700;"></div>
+        <span>Disease </span>
+    </div>
+</div>
 
 <div class="tooltip" style="opacity: 0;"></div>
 
@@ -358,48 +406,17 @@ WHERE {
                 .on("mouseout", () => tooltip.style("opacity", 0))
                 .on("click", (event, d) => {
                     const selectedNodeId = d.id;
-                    const isAgonist = selectedNodeId.includes('_agonist');
-                    const isAntagonist = selectedNodeId.includes('_antagonist');
-
-                    let counterpartNodeId;
-
-                    // If an agonist is clicked, find its antagonist counterpart
-                    if (isAgonist) {
-                        counterpartNodeId = selectedNodeId.replace('_agonist', '_antagonist');
-                    }
-                    // If an antagonist is clicked, find its agonist counterpart
-                    else if (isAntagonist) {
-                        counterpartNodeId = selectedNodeId.replace('_antagonist', '_agonist');
-                    }
-
-                    // Highlight the links for both agonist and antagonist
+                    // Highlight the links connected to the selected node and fade the others
                     link.style("stroke-opacity", (l) => {
-                        // Highlight the links for the selected node and its counterpart (agonist/antagonist)
-                        const isLinkToSelected = l.source.id === selectedNodeId || l.target.id === selectedNodeId;
-                        const isLinkToCounterpart = l.source.id === counterpartNodeId || l.target.id === counterpartNodeId;
-                        return isLinkToSelected || isLinkToCounterpart ? 1 : 0.1;
+                        return l.source.id === selectedNodeId || l.target.id === selectedNodeId ? 1 : 0.1;
                     })
                         .style("stroke", (l) => {
-                            // Use a different color to highlight the links to both the agonist and antagonist
-                            const isLinkToSelected = l.source.id === selectedNodeId || l.target.id === selectedNodeId;
-                            const isLinkToCounterpart = l.source.id === counterpartNodeId || l.target.id === counterpartNodeId;
-                            return isLinkToSelected || isLinkToCounterpart ? "#D40073" : "#999";
+                            return l.source.id === selectedNodeId || l.target.id === selectedNodeId ? "#D40073" : "#999";
                         })
                         .style("stroke-width", (l) => {
-                            // Make the highlighted links thicker
-                            const isLinkToSelected = l.source.id === selectedNodeId || l.target.id === selectedNodeId;
-                            const isLinkToCounterpart = l.source.id === counterpartNodeId || l.target.id === counterpartNodeId;
-                            return isLinkToSelected || isLinkToCounterpart ? 4 : 2;  // Thicker for highlighted links
+                            return l.source.id === selectedNodeId || l.target.id === selectedNodeId ? 4 : 2;  // Thicker for highlighted links
                         });
-
-                    // If the selected node is an agonist or antagonist, highlight its counterpart
-                    if (counterpartNodeId) {
-                        node.selectAll("circle")
-                            .attr("stroke", (n) => n.id === counterpartNodeId ? "#D40073" : null)  // Highlight the counterpart
-                            .attr("stroke-width", (n) => n.id === counterpartNodeId ? 3 : null);  // Add border to counterpart
-                    }
                 });
-
 
             node.append("text")
                 .text(d => d.id.replace(/_agonist|_antagonist$/, ''))  // This removes the "_agonist" or "_antagonist" suffix
