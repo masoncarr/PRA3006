@@ -358,17 +358,48 @@ WHERE {
                 .on("mouseout", () => tooltip.style("opacity", 0))
                 .on("click", (event, d) => {
                     const selectedNodeId = d.id;
-                    // Highlight the links connected to the selected node and fade the others
+                    const isAgonist = selectedNodeId.includes('_agonist');
+                    const isAntagonist = selectedNodeId.includes('_antagonist');
+
+                    let counterpartNodeId;
+
+                    // If an agonist is clicked, find its antagonist counterpart
+                    if (isAgonist) {
+                        counterpartNodeId = selectedNodeId.replace('_agonist', '_antagonist');
+                    }
+                    // If an antagonist is clicked, find its agonist counterpart
+                    else if (isAntagonist) {
+                        counterpartNodeId = selectedNodeId.replace('_antagonist', '_agonist');
+                    }
+
+                    // Highlight the links for both agonist and antagonist
                     link.style("stroke-opacity", (l) => {
-                        return l.source.id === selectedNodeId || l.target.id === selectedNodeId ? 1 : 0.1;
+                        // Highlight the links for the selected node and its counterpart (agonist/antagonist)
+                        const isLinkToSelected = l.source.id === selectedNodeId || l.target.id === selectedNodeId;
+                        const isLinkToCounterpart = l.source.id === counterpartNodeId || l.target.id === counterpartNodeId;
+                        return isLinkToSelected || isLinkToCounterpart ? 1 : 0.1;
                     })
                         .style("stroke", (l) => {
-                            return l.source.id === selectedNodeId || l.target.id === selectedNodeId ? "#D40073" : "#999";
+                            // Use a different color to highlight the links to both the agonist and antagonist
+                            const isLinkToSelected = l.source.id === selectedNodeId || l.target.id === selectedNodeId;
+                            const isLinkToCounterpart = l.source.id === counterpartNodeId || l.target.id === counterpartNodeId;
+                            return isLinkToSelected || isLinkToCounterpart ? "#D40073" : "#999";
                         })
                         .style("stroke-width", (l) => {
-                            return l.source.id === selectedNodeId || l.target.id === selectedNodeId ? 4 : 2;  // Thicker for highlighted links
+                            // Make the highlighted links thicker
+                            const isLinkToSelected = l.source.id === selectedNodeId || l.target.id === selectedNodeId;
+                            const isLinkToCounterpart = l.source.id === counterpartNodeId || l.target.id === counterpartNodeId;
+                            return isLinkToSelected || isLinkToCounterpart ? 4 : 2;  // Thicker for highlighted links
                         });
+
+                    // If the selected node is an agonist or antagonist, highlight its counterpart
+                    if (counterpartNodeId) {
+                        node.selectAll("circle")
+                            .attr("stroke", (n) => n.id === counterpartNodeId ? "#D40073" : null)  // Highlight the counterpart
+                            .attr("stroke-width", (n) => n.id === counterpartNodeId ? 3 : null);  // Add border to counterpart
+                    }
                 });
+
 
             node.append("text")
                 .text(d => d.id.replace(/_agonist|_antagonist$/, ''))  // This removes the "_agonist" or "_antagonist" suffix
