@@ -8,12 +8,16 @@
     <style>
         body {
             background-color: whitesmoke;
-            font-family: Verdana, sans-serif;
+            font-family: 'Optima', sans-serif;
         }
+
 
         h1 {
             color: black;
             text-align: left;
+            background-color: lightpink;
+            padding: 10px;
+            border-radius: 8px;
         }
 
         #network {
@@ -53,16 +57,97 @@
             box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
         }
 
+        <style>
+         body {
+             background-color: whitesmoke;
+             font-family: Verdana, sans-serif;
+         }
+
+        h1 {
+            color: black;
+            text-align: left;
+            background-color: lightpink;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        #network {
+            width: 100%;
+            height: 90vh;
+            border: 1px solid #ccc;
+        }
+
+        .node circle {
+            stroke: #fff;
+            stroke-width: 1.5px;
+        }
+
+        .node text {
+            font-size: 12px;
+            pointer-events: none;
+        }
+
+        .link {
+            stroke: #999;
+            stroke-opacity: 0.6;
+        }
+
+        .loading {
+            font-style: italic;
+            color: gray;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: white;
+            border: 1px solid gray;
+            padding: 5px;
+            border-radius: 4px;
+            pointer-events: none;
+            font-size: 14px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Styling for the textboxes */
+        textarea {
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+            text-align: left;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            resize: none;
+            width: 100%;
+            box-sizing: border-box;
+            white-space: pre-wrap; /* Ensures proper text wrapping and alignment */
+        }
+
+        /* Make the textarea responsive */
+        #textbox1, #textbox2 {
+            max-width: 600px; /* Limit the maximum width */
+            height: 100px; /* Adjust the height for better readability */
+        }
     </style>
+
 </head>
 
 <body>
 
 <h1>Dopaminergic Pathways of the Drugs used to Treat Parkinson's Disease</h1>
 
-<p>Authors: Renee Carr, Léa Kremers, Sophie Parsons, Anna Pihlakas</p>
+<div style="display: flex; justify-content: center; gap: 20px; margin-top: 20px;">
+    <div>
+        <textarea id="textbox1" rows="6" cols="60" style="text-align: left; direction: ltr; resize: none; padding: 10px 15px; word-wrap: break-word; overflow-y: auto;">
+Authors: Renee Carr, Léa Kremers, Sophie Parsons, Anna Pihlakas
+        </textarea>
+    </div>
+    <div>
+        <textarea id="textbox2" rows="6" cols="60" style="text-align: left; direction: ltr; resize: none; padding: 10px 15px; word-wrap: break-word; overflow-y: auto;">
+We dived into WikiData and made a query to see what drugs are used to treat Parkinson's disease, while filtering out drugs that affect the Dopamine receptors.
+        </textarea>
+    </div>
+</div>
 
-<p>We dived into WikiData and made a query to see what drugs are used to treat Parkinson's disease, while filtering out drugs that affect the Dopamine receptors.</p>
 
 <div id="network" class="loading"> </div>
 
