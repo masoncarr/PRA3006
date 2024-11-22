@@ -351,7 +351,7 @@ WHERE {
                 })
                 .on("mouseover", (event, d) => {
                     tooltip.style("opacity", 1)
-                        .html(`<strong>${d.id}</strong>`)
+                        .html(`<strong>${d.id.replace(/_agonist|_antagonist$/, '')}</strong>`)
                         .style("left", (event.pageX + 10) + "px")
                         .style("top", (event.pageY - 10) + "px");
                 })
@@ -371,7 +371,7 @@ WHERE {
                 });
 
             node.append("text")
-                .text(d => d.id)
+                .text(d => d.id.replace(/_agonist|_antagonist$/, ''))  // This removes the "_agonist" or "_antagonist" suffix
                 .attr("x", 12)
                 .attr("y", 3)
                 .style("font-size", "12px");
