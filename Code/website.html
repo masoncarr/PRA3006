@@ -185,24 +185,40 @@
     document.addEventListener("DOMContentLoaded", () => {
         const sparqlEndpoint = "https://query.wikidata.org/sparql";
         const sparqlQuery = `
-        SELECT ?item ?itemLabel ?receptorLabel ?roleLabel ?role ?diseaseLabel
+SELECT ?item ?itemLabel ?receptorLabel ?roleLabel ?diseaseLabel ?structureLabel ?bnsLabel ?formulaLabel
 WHERE {
+  # Setting ?receptors as dopamine receptors D1-D5
   VALUES ?receptor {
-  wd:Q21110867
-  wd:Q2034004
-  wd:Q21110872
-  wd:Q308856
-  wd:Q21131500}.
-  FILTER EXISTS {?item wdt:P129 ?receptor.}.
+    wd:Q21110867
+    wd:Q2034004
+    wd:Q21110872
+    wd:Q308856
+    wd:Q21131500
+  }
+
+  # Setting ?role as agonist or antagonist
   VALUES ?role {
-  wd:Q600203
-  wd:Q3271533}.
-  ?item wdt:P2868 ?role.
+    wd:Q389934  # Agonist role
+    wd:Q410943  # Antagonist role
+  }
+
+  # Filtering drug interactions with receptors by their proper role
+  ?item p:P129 ?statement.
+  ?statement pq:P2868 ?role.
+  ?statement ps:P129 ?receptor.
+
+  # Filter for only Parkinson's treatment
   ?item wdt:P2175 ?disease.
-  FILTER(?disease = wd:Q11085).
+  FILTER(?disease = wd:Q11085)
+
+  # Grab chemical diagram, ball-and-stick model and chemical formula if they exist
+  OPTIONAL {?item wdt:P117 ?structure.}
+  OPTIONAL {?item wdt:P8224 ?bns.}
+  OPTIONAL {?item wdt:P274 ?formula.}
 
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en".}
-}`;
+}
+`;
 
         fetch(`${sparqlEndpoint}?query=${encodeURIComponent(sparqlQuery)}`, {
             headers: { 'Accept': 'application/json' }
@@ -225,9 +241,12 @@ WHERE {
                     const role = result.roleLabel?.value || 'Unknown Role';
                     const disease = result.diseaseLabel?.value || 'Parkinson\'s Disease';
 
-                    // Add drug node
-                    if (!nodes.find(node => node.id === drug)) {
-                        nodes.push({ id: drug, group: 1 });
+                    // Check if drug already exists in the nodes array for the specific role (agonist or antagonist)
+                    const drugNodeId = role === 'agonist' ? `${drug}_agonist` : role === 'antagonist' ? `${drug}_antagonist` : drug;
+
+                    // Add drug node if not already present for specific role
+                    if (!nodes.find(node => node.id === drugNodeId)) {
+                        nodes.push({ id: drugNodeId, group: 1, role: role });  // Added 'role' to differentiate agonist and antagonist
                     }
 
                     // Add receptor node
@@ -247,9 +266,10 @@ WHERE {
 
                     // Add links
                     links.push({ source: disease, target: role, type: 'affects' });
-                    links.push({ source: role, target: drug, type: 'has role' });
-                    links.push({ source: drug, target: receptor, type: 'treats' });
+                    links.push({ source: role, target: drugNodeId, type: 'has role' });
+                    links.push({ source: drugNodeId, target: receptor, type: 'treats' });
                 });
+
 
                 createInteractiveNetwork(nodes, links);
             })
