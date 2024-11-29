@@ -469,8 +469,8 @@ WHERE {
                         tooltip.style("opacity", 1)
                             .html(`
                                 <strong>${d.id.replace(/_agonist|_antagonist$/, '')}</strong><br>
-                                <strong>Structure:</strong> ${structureValid ? `<img src="${d.structureLabel}" alt="Structure Image" style="max-width: 100px; height: auto;"><br>` : 'No structure available<br>'}
-                                <strong>Ball-and-Stick Model:</strong> ${bnsValid ? `<img src="${d.bnsLabel}" alt="Ball-and-Stick Model" style="max-width: 100px; height: auto;"><br>` : 'No ball-and-stick model available<br>'}
+                                <strong>Structure:</strong> ${structureValid ? `<img src="${d.structureLabel}" alt="Structure Image" style="max-width: 150px; height: auto;"><br>` : 'No structure available<br>'}
+                                <strong>Ball-and-Stick Model:</strong> ${bnsValid ? `<img src="${d.bnsLabel}" alt="Ball-and-Stick Model" style="max-width: 150px; height: auto;"><br>` : 'No ball-and-stick model available<br>'}
                                 <strong>Formula:</strong> ${d.formulaLabel}
                                 `)
                             .style("left", (event.pageX + 10) + "px")
