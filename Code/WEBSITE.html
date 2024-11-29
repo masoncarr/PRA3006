@@ -241,7 +241,7 @@
         const sparqlQuery = `
 SELECT ?item ?itemLabel ?receptorLabel ?roleLabel ?diseaseLabel ?structureLabel ?bnsLabel ?formulaLabel
 WHERE {
-  # Setting ?receptors as dopamine receptors D1-D5
+  # Setting ?receptor as dopamine receptors D1-D5
   VALUES ?receptor {
     wd:Q21110867
     wd:Q2034004
@@ -289,18 +289,31 @@ WHERE {
                 const nodes = [];
                 const links = [];
 
+                // Inside the .then() method, when processing the results from SPARQL
                 results.forEach(result => {
                     const drug = result.itemLabel?.value || 'Unknown Drug';
                     const receptor = result.receptorLabel?.value || 'Unknown Receptor';
                     const role = result.roleLabel?.value || 'Unknown Role';
                     const disease = result.diseaseLabel?.value || 'Parkinson\'s Disease';
 
+                    // Extract additional data (structure, BNS, formula)
+                    const structureLabel = result.structureLabel?.value || 'No structure available';
+                    const bnsLabel = result.bnsLabel?.value || 'No ball-and-stick model available';
+                    const formulaLabel = result.formulaLabel?.value || 'No formula available';
+
                     // Check if drug already exists in the nodes array for the specific role (agonist or antagonist)
                     const drugNodeId = role === 'agonist' ? `${drug}_agonist` : role === 'antagonist' ? `${drug}_antagonist` : drug;
 
                     // Add drug node if not already present for specific role
                     if (!nodes.find(node => node.id === drugNodeId)) {
-                        nodes.push({ id: drugNodeId, group: 1, role: role });  // Added 'role' to differentiate agonist and antagonist
+                        nodes.push({
+                            id: drugNodeId,
+                            group: 1,
+                            role: role,
+                            structureLabel: structureLabel,
+                            bnsLabel: bnsLabel,
+                            formulaLabel: formulaLabel
+                        });
                     }
 
                     // Add receptor node
@@ -323,6 +336,7 @@ WHERE {
                     links.push({ source: role, target: drugNodeId, type: 'has role' });
                     links.push({ source: drugNodeId, target: receptor, type: 'treats' });
                 });
+
 
 
                 createInteractiveNetwork(nodes, links);
@@ -389,6 +403,29 @@ WHERE {
                         d.fy = null;
                     }));
 
+            // Cache to store image validity status
+            const imageValidityCache = {};
+
+            const checkImageValid = (url) => {
+                // Return cached result if already checked
+                if (imageValidityCache[url] !== undefined) {
+                    return Promise.resolve(imageValidityCache[url]);
+                }
+
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        imageValidityCache[url] = true;
+                        resolve(true);  // Image loaded successfully
+                    };
+                    img.onerror = () => {
+                        imageValidityCache[url] = false;
+                        resolve(false); // Image failed to load
+                    };
+                    img.src = url;
+                });
+            };
+
             node.append("circle")
                 .attr("r", 10)
                 .attr("fill", d => {
@@ -397,13 +434,33 @@ WHERE {
                     if (d.group === 3) return "#E777E0";  // Role nodes
                     return "#ffd700";  // Disease nodes
                 })
-                .on("mouseover", (event, d) => {
-                    tooltip.style("opacity", 1)
-                        .html(`<strong>${d.id.replace(/_agonist|_antagonist$/, '')}</strong>`)
-                        .style("left", (event.pageX + 10) + "px")
-                        .style("top", (event.pageY - 10) + "px");
+                .on("mouseover", async (event, d) => {
+                    // Default values for structure and ball-and-stick image validity
+                    const structureValid = d.structureLabel ? await checkImageValid(d.structureLabel) : false;
+                    const bnsValid = d.bnsLabel ? await checkImageValid(d.bnsLabel) : false;
+
+                    if (d.group === 1) {  // Only show tooltip for drug nodes
+                        tooltip.style("opacity", 1)
+                            .html(`
+                                <strong>${d.id.replace(/_agonist|_antagonist$/, '')}</strong><br>
+                                <strong>Structure:</strong> ${structureValid ? `<img src="${d.structureLabel}" alt="Structure Image" style="max-width: 100px; height: auto;"><br>` : 'No structure available<br>'}
+                                <strong>Ball-and-Stick Model:</strong> ${bnsValid ? `<img src="${d.bnsLabel}" alt="Ball-and-Stick Model" style="max-width: 100px; height: auto;"><br>` : 'No ball-and-stick model available<br>'}
+                                <strong>Formula:</strong> ${d.formulaLabel}
+                                `)
+                            .style("left", (event.pageX + 10) + "px")
+                            .style("top", (event.pageY - 10) + "px");
+                    }
+                    else {
+                        tooltip.style("opacity", 1)
+                            .html(`<strong>${d.id.replace(/_agonist|_antagonist$/, '')}</strong>`) // displays name without _agonist or _antagonist
+                            .style("left", (event.pageX + 10) + "px")
+                            .style("top", (event.pageY - 10) + "px");
+                    }
                 })
-                .on("mouseout", () => tooltip.style("opacity", 0))
+
+
+
+                    .on("mouseout", () => tooltip.style("opacity", 0))
                 .on("click", (event, d) => {
                     const selectedNodeId = d.id;
                     const isAgonist = selectedNodeId.includes('_agonist');
@@ -440,6 +497,7 @@ WHERE {
                             return isLinkToSelected || isLinkToCounterpart ? 4 : 2;  // Thicker for highlighted links
                         });
                 });
+
 
             node.append("text")
                 .text(d => d.id.replace(/_agonist|_antagonist$/, ''))  // This removes the "_agonist" or "_antagonist" suffix
