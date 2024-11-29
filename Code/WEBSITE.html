@@ -5,13 +5,13 @@
     <meta charset="UTF-8">
     <title>Dopaminergic Dynamics - Interactive Network</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <style>
-        body {
+    <style> /* this section of the code styles the website with color, font etc */
+        body { /* here, the body section is styled */
             background-color: whitesmoke;
             font-family: 'Optima', sans-serif;
         }
 
-        h1 {
+        h1 { /* here, the page header is styled*/
             color: black;
             text-align: left;
             background-color: lightpink;
@@ -19,34 +19,34 @@
             border-radius: 8px;
         }
 
-        #network {
+        #network { /* here, it styles the network container */
             width: 80%;
             height: 90vh;
             border: 1px solid #ccc;
             display: inline-block;
         }
 
-        .node circle {
+        .node circle { /* this styles the nodes of the network */
             stroke: #fff;
             stroke-width: 1.5px;
         }
 
-        .node text {
+        .node text { /* this styles the node's text */
             font-size: 12px;
             pointer-events: none;
         }
 
-        .link {
+        .link { /* this styles the links connecting the nodes */
             stroke: #999;
             stroke-opacity: 0.6;
         }
 
-        .loading {
+        .loading { /* styles the loading message */
             font-style: italic;
             color: gray;
         }
 
-        .tooltip {
+        .tooltip { /* styles the tooltip */
             position: absolute;
             background: white;
             border: 1px solid gray;
@@ -57,8 +57,7 @@
             box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
         }
 
-        /* Styling for the textboxes */
-        textarea {
+        textarea { /* styling for the textboxes */
             font-family: 'Roboto', sans-serif;
             font-size: 16px;
             text-align: left;
@@ -71,14 +70,12 @@
             white-space: pre-wrap;
         }
 
-        /* Make the textarea responsive */
         #textbox1, #textbox2 {
             max-width: 600px; /* Limit the maximum width */
             height: 100px; /* Adjust the height for better readability */
         }
 
-        /* Navigation Bar Styles */
-        nav {
+        nav { /* styles the navigation bar */
             background-color: white;
             width: 100%;
             padding: 10px;
@@ -86,36 +83,30 @@
             border-bottom: 2px solid #ccc;
         }
 
-        nav a {
+        nav a { /* styles the navigation's text */
             padding: 10px 20px;
             text-decoration: none;
             color: black;
             font-weight: bold;
         }
 
-        nav a:hover {
-            background-color: #f0f0f0;
-            border-radius: 4px;
-        }
-
-        /* Styling for the Parkinson's Disease Section */
+        /* styling for the Parkinson's Disease and About Us section */
         #parkinsons, #aboutUs {
             padding: 20px;
             background-color: white;
             border: 1px solid #ccc;
             margin-top: 20px;
-            position: fixed; /* Fix to cover the whole page */
+            position: fixed; /* fix to cover the whole page */
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 10; /* Ensure it overlays the network */
+            z-index: 10; /* ensure it overlays the network */
             overflow: auto;
         }
 
-        /* Initially hide the textboxes */
         #textbox1 {
-            display: none;
+            display: none; /* initially hide the textbox */
             font-family: 'Roboto', sans-serif;
             font-size: 16px;
             text-align: left;
@@ -128,8 +119,7 @@
             white-space: pre-wrap;
         }
 
-        /* Styling for the legend */
-        #legend {
+        #legend {  /* styling for the legend */
             display: inline-block;
             vertical-align: top;
             width: 15%;
@@ -141,16 +131,16 @@
             box-sizing: border-box;
         }
 
-        .legend-item {
+        .legend-item { /* styling the legend icons */
             display: flex;
             align-items: center;
             margin-bottom: 10px;
         }
 
-        .legend-color {
+        .legend-color { /* styling the legend colors */
             width: 20px;
             height: 20px;
-            border-radius: 50%; /* This makes the legend icons circular */
+            border-radius: 50%; /* this makes the legend icons circular */
             margin-right: 10px;
         }
     </style>
@@ -160,12 +150,14 @@
 
 <h1>Dopaminergic Pathways of the Drugs Used to Treat Parkinson's Disease 🧠 &#128138;</h1>
 <div style="background-color: white; width: 100%; padding: 10px; text-align: center; border-bottom: 2px solid #ccc;">
+    <!-- navigation bars with links to the sections -->
     <a href="javascript:void(0);" style="padding: 10px 20px; text-decoration: none; color: black; font-weight: bold;" onclick="showParkinsonsInfo()">Parkinson's Disease Information</a>
     <a href="javascript:void(0);" style="padding: 10px 20px; text-decoration: none; color: black; font-weight: bold;" onclick="showAuthors()">About Us</a>
 </div>
 
-<!-- Parkinson's Disease Information Section -->
+<!-- Parkinson's Disease Information section -->
 <div id="parkinsons" style="display: none;">
+    <!-- Back button to return to the Home page -->
     <button onclick="goBack('parkinsons')" style="padding: 10px 20px; background-color: #f0f0f0; border: 1px solid #ccc; font-weight: bold; cursor: pointer;">Back</button>
      <h2 style="font-size: 23px; line-height: 1.5;">Parkinson's Disease Information</h2>
     <p style="font-size: 23px; line-height: 1.8;">Here is some information about Parkinson's disease!</p>
@@ -197,8 +189,9 @@
 </div>
 </div>
 
-<!-- About Us Section -->
+<!-- About Us section -->
 <div id="aboutUs" style="display: none;">
+    <!-- Back button to return to the Home page -->
     <button onclick="goBack('aboutUs')" style="padding: 10px 20px; background-color: #f0f0f0; border: 1px solid #ccc; font-weight: bold; cursor: pointer;">Back</button>
     <h2>About Us</h2>
     <p style="font-size: 18px;">Authors: Anna Pihlakas, Léa Kremers, Sophie Parsons, Renee Carr.</p>
@@ -212,12 +205,12 @@
     </p>
 </div>
 
-<!-- Textbox for authors -->
+<!-- textbox for authors -->
 <textarea id="textbox1" readonly>Authors: Anna Pihlakas, Léa Kremers, Sophie Parsons, Renee Carr</textarea>
 
 <div id="network" class="loading"></div>
 
-<!-- Legend Section -->
+<!-- legend Section -->
 <div id="legend">
     <h3>Legend</h3>
     <div class="legend-item">
@@ -242,28 +235,28 @@
 
 <script>
     function showParkinsonsInfo() {
-        // Hide all other textboxes when clicking Parkinson's Disease Information
+        // hide all other textboxes when clicking Parkinson's Disease Information
         document.getElementById('textbox1').style.display = 'none';
 
-        // Show the Parkinson's Disease Information section and cover the entire page
+        // show the Parkinson's Disease Information section and cover the entire page
         document.getElementById('parkinsons').style.display = 'block';
     }
 
     function showAuthors() {
-        // Hide the Parkinson's Disease Information section
+        // hide the Parkinson's Disease Information section
         document.getElementById('parkinsons').style.display = 'none';
 
-        // Show the About Us section
+        // show the About Us section
         document.getElementById('aboutUs').style.display = 'block';
     }
 
     function goBack(section) {
-        // Go back to the homepage (hides the section)
+        // go back to the homepage (hides the section)
         document.getElementById(section).style.display = 'none';
     }
-
+    // Wait for the document to fully load before running the script
     document.addEventListener("DOMContentLoaded", () => {
-        const sparqlEndpoint = "https://query.wikidata.org/sparql";
+        const sparqlEndpoint = "https://query.wikidata.org/sparql"; // SPARQL endpoint to query Wikidata
         const sparqlQuery = `
 SELECT ?item ?itemLabel ?receptorLabel ?roleLabel ?diseaseLabel ?structureLabel ?bnsLabel ?formulaLabel
 WHERE {
@@ -299,38 +292,38 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en".}
 }
 `;
-
+        // fetch data from the SPARQL endpoint
         fetch(`${sparqlEndpoint}?query=${encodeURIComponent(sparqlQuery)}`, {
             headers: { 'Accept': 'application/json' }
         })
-            .then(response => response.json())
+            .then(response => response.json()) // convert response to JSON format (this is a callback loop)
             .then(data => {
-                const results = data.results.bindings;
+                const results = data.results.bindings; // results from the query
 
                 if (results.length === 0) {
                     document.getElementById('network').textContent = 'No data available to display.';
                     return;
                 }
 
-                const nodes = [];
-                const links = [];
+                const nodes = []; // array to hold the nodes of the graph
+                const links = []; // array to hold the links between nodes
 
-                // Inside the .then() method, when processing the results from SPARQL
+                // process each result from the SPARQL query
                 results.forEach(result => {
                     const drug = result.itemLabel?.value || 'Unknown Drug';
                     const receptor = result.receptorLabel?.value || 'Unknown Receptor';
                     const role = result.roleLabel?.value || 'Unknown Role';
                     const disease = result.diseaseLabel?.value || 'Parkinson\'s Disease';
 
-                    // Extract additional data (structure, BNS, formula)
+                    // extract additional data (structure, BNS, formula)
                     const structureLabel = result.structureLabel?.value || 'No structure available';
                     const bnsLabel = result.bnsLabel?.value || 'No ball-and-stick model available';
                     const formulaLabel = result.formulaLabel?.value || 'No formula available';
 
-                    // Check if drug already exists in the nodes array for the specific role (agonist or antagonist)
+                    // check if drug already exists in the nodes array for the specific role (agonist or antagonist)
                     const drugNodeId = role === 'agonist' ? `${drug}_agonist` : role === 'antagonist' ? `${drug}_antagonist` : drug;
 
-                    // Add drug node if not already present for specific role
+                    // add drug node if not already present for specific role
                     if (!nodes.find(node => node.id === drugNodeId)) {
                         nodes.push({
                             id: drugNodeId,
@@ -342,29 +335,28 @@ WHERE {
                         });
                     }
 
-                    // Add receptor node
+                    // add receptor node
                     if (!nodes.find(node => node.id === receptor)) {
                         nodes.push({ id: receptor, group: 2 });
                     }
 
-                    // Add role node
+                    // add role node
                     if (role && !nodes.find(node => node.id === role)) {
                         nodes.push({ id: role, group: 3 });
                     }
 
-                    // Add disease node
+                    // add disease node
                     if (disease && !nodes.find(node => node.id === disease)) {
                         nodes.push({ id: disease, group: 4 });
                     }
 
-                    // Add links
+                    // add links
                     links.push({ source: disease, target: role, type: 'affects' });
                     links.push({ source: role, target: drugNodeId, type: 'has role' });
                     links.push({ source: drugNodeId, target: receptor, type: 'treats' });
                 });
 
-
-
+                // create the interactive network visualization
                 createInteractiveNetwork(nodes, links);
             })
             .catch(error => {
@@ -372,55 +364,59 @@ WHERE {
                 document.getElementById('network').textContent = 'Error loading data. Please try again later.';
             });
 
+        // function to create the interactive network visualization
         function createInteractiveNetwork(nodes, links) {
             const width = window.innerWidth;
             const height = window.innerHeight * 0.9;
 
+            // create the SVG element for the network
             const svg = d3.select("#network")
                 .classed("loading", false)
                 .append("svg")
                 .attr("width", width)
                 .attr("height", height);
 
-            const tooltip = d3.select(".tooltip");
+            const tooltip = d3.select(".tooltip"); // tooltip for displaying additional info
 
-            const zoom = d3.zoom()
-                .scaleExtent([0.5, 5])
+            const zoom = d3.zoom() // set up zoom functionality
+                .scaleExtent([0.5, 5]) // set the zoom scale limits
                 .on("zoom", (event) => {
-                    svgGroup.attr("transform", event.transform);
+                    svgGroup.attr("transform", event.transform); // apply zoom transformation
                 });
 
-            svg.call(zoom);
+            svg.call(zoom); // enable zoom functionality on the SVG
 
             const svgGroup = svg.append("g");
 
             const simulation = d3.forceSimulation(nodes)
-                .force("link", d3.forceLink(links).id(d => d.id).distance(150))
-                .force("charge", d3.forceManyBody().strength(-400))
-                .force("center", d3.forceCenter(width / 2, height / 2));
+                .force("link", d3.forceLink(links).id(d => d.id).distance(150)) // link force with distance between nodes
+                .force("charge", d3.forceManyBody().strength(-400)) // repulsive force to prevent nodes from overlapping
+                .force("center", d3.forceCenter(width / 2, height / 2)); // center the network
 
+            // create links between nodes
             const link = svgGroup.append("g")
                 .attr("class", "links")
                 .selectAll("line")
                 .data(links)
                 .enter().append("line")
                 .attr("class", "link")
-                .style("stroke", "#aaa")
-                .style("stroke-width", 2);
+                .style("stroke", "#aaa") // default link color
+                .style("stroke-width", 2); // default link width
 
+            // create nodes in the network
             const node = svgGroup.append("g")
                 .attr("class", "nodes")
                 .selectAll("g")
                 .data(nodes)
                 .enter().append("g")
-                .call(d3.drag()
+                .call(d3.drag() // enable drag behavior on nodes
                     .on("start", (event, d) => {
                         if (!event.active) simulation.alphaTarget(0.3).restart();
                         d.fx = d.x;
                         d.fy = d.y;
                     })
                     .on("drag", (event, d) => {
-                        d.fx = event.x;
+                        d.fx = event.x; // update node position during drag
                         d.fy = event.y;
                     })
                     .on("end", (event, d) => {
@@ -429,11 +425,11 @@ WHERE {
                         d.fy = null;
                     }));
 
-            // Cache to store image validity status
+            // cache to store image validity status
             const imageValidityCache = {};
 
             const checkImageValid = (url) => {
-                // Return cached result if already checked
+                // return cached result if already checked
                 if (imageValidityCache[url] !== undefined) {
                     return Promise.resolve(imageValidityCache[url]);
                 }
@@ -442,11 +438,11 @@ WHERE {
                     const img = new Image();
                     img.onload = () => {
                         imageValidityCache[url] = true;
-                        resolve(true);  // Image loaded successfully
+                        resolve(true);  // image loaded successfully
                     };
                     img.onerror = () => {
                         imageValidityCache[url] = false;
-                        resolve(false); // Image failed to load
+                        resolve(false); // image failed to load
                     };
                     img.src = url;
                 });
@@ -455,17 +451,17 @@ WHERE {
             node.append("circle")
                 .attr("r", 10)
                 .attr("fill", d => {
-                    if (d.group === 1) return "#ff6347";  // Drug nodes
-                    if (d.group === 2) return "#4682b4";  // Receptor nodes
-                    if (d.group === 3) return "#E777E0";  // Role nodes
+                    if (d.group === 1) return "#ff6347";  // drug nodes
+                    if (d.group === 2) return "#4682b4";  // receptor nodes
+                    if (d.group === 3) return "#E777E0";  // role nodes
                     return "#ffd700";  // Disease nodes
                 })
                 .on("mouseover", async (event, d) => {
-                    // Default values for structure and ball-and-stick image validity
+                    // default values for structure and ball-and-stick image validity
                     const structureValid = d.structureLabel ? await checkImageValid(d.structureLabel) : false;
                     const bnsValid = d.bnsLabel ? await checkImageValid(d.bnsLabel) : false;
 
-                    if (d.group === 1) {  // Only show tooltip for drug nodes
+                    if (d.group === 1) {  // only show tooltip for drug nodes
                         tooltip.style("opacity", 1)
                             .html(`
                                 <strong>${d.id.replace(/_agonist|_antagonist$/, '')}</strong><br>
@@ -494,39 +490,39 @@ WHERE {
 
                     let counterpartNodeId;
 
-                    // If an agonist is clicked, find its antagonist counterpart
+                    // if an agonist is clicked, find its antagonist counterpart
                     if (isAgonist) {
                         counterpartNodeId = selectedNodeId.replace('_agonist', '_antagonist');
                     }
-                    // If an antagonist is clicked, find its agonist counterpart
+                    // if an antagonist is clicked, find its agonist counterpart
                     else if (isAntagonist) {
                         counterpartNodeId = selectedNodeId.replace('_antagonist', '_agonist');
                     }
 
-                    // Highlight the links for both agonist and antagonist
+                    // highlight the links for both agonist and antagonist
                     link.style("stroke-opacity", (l) => {
-                        // Highlight the links for the selected node and its counterpart (agonist/antagonist)
+                        // highlight the links for the selected node and its counterpart (agonist/antagonist)
                         const isLinkToSelected = l.source.id === selectedNodeId || l.target.id === selectedNodeId;
                         const isLinkToCounterpart = l.source.id === counterpartNodeId || l.target.id === counterpartNodeId;
                         return isLinkToSelected || isLinkToCounterpart ? 1 : 0.1;
                     })
                         .style("stroke", (l) => {
-                            // Use a different color to highlight the links to both the agonist and antagonist
+                            // use a different color to highlight the links to both the agonist and antagonist
                             const isLinkToSelected = l.source.id === selectedNodeId || l.target.id === selectedNodeId;
                             const isLinkToCounterpart = l.source.id === counterpartNodeId || l.target.id === counterpartNodeId;
                             return isLinkToSelected || isLinkToCounterpart ? "#D40073" : "#999";
                         })
                         .style("stroke-width", (l) => {
-                            // Make the highlighted links thicker
+                            // make the highlighted links thicker
                             const isLinkToSelected = l.source.id === selectedNodeId || l.target.id === selectedNodeId;
                             const isLinkToCounterpart = l.source.id === counterpartNodeId || l.target.id === counterpartNodeId;
-                            return isLinkToSelected || isLinkToCounterpart ? 4 : 2;  // Thicker for highlighted links
+                            return isLinkToSelected || isLinkToCounterpart ? 4 : 2;  // thicker for highlighted links
                         });
                 });
 
 
             node.append("text")
-                .text(d => d.id.replace(/_agonist|_antagonist$/, ''))  // This removes the "_agonist" or "_antagonist" suffix
+                .text(d => d.id.replace(/_agonist|_antagonist$/, ''))  // this removes the "_agonist" or "_antagonist" suffix
                 .attr("x", 12)
                 .attr("y", 3)
                 .style("font-size", "12px");
