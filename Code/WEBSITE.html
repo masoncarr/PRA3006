@@ -5,188 +5,188 @@
     <meta charset="UTF-8">
     <title>Dopaminergic Dynamics - Interactive Network</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <style> /* this section of the code styles the website with color, font etc */
-        body { /* here, the body section is styled */
-            background-color: whitesmoke;
-            font-family: 'Optima', sans-serif;
-        }
+    <style> /* this section of the code styles the website with color, font etc (CSS) */
+    body { /* here, the body section is styled */
+        background-color: whitesmoke;
+        font-family: 'Optima', sans-serif;
+    }
 
-        h1 { /* here, the page header is styled*/
-            color: black;
-            text-align: left;
-            background-color: lightpink;
-            padding: 10px;
-            border-radius: 8px;
-        }
+    h1 { /* here, the page header is styled*/
+        color: black;
+        text-align: left;
+        background-color: lightpink;
+        padding: 10px;
+        border-radius: 8px;
+    }
 
-        #network { /* here, it styles the network container */
-            width: 80%;
-            height: 90vh;
-            border: 1px solid #ccc;
-            display: inline-block;
-        }
+    #network { /* here, it styles the network container */
+        width: 80%;
+        height: 90vh;
+        border: 1px solid #ccc;
+        display: inline-block;
+    }
 
-        .node circle { /* this styles the nodes of the network */
-            stroke: #fff;
-            stroke-width: 1.5px;
-        }
+    .node circle { /* this styles the nodes of the network */
+        stroke: #fff;
+        stroke-width: 1.5px;
+    }
 
-        .node text { /* this styles the node's text */
-            font-size: 12px;
-            pointer-events: none;
-        }
+    .node text { /* this styles the node's text */
+        font-size: 12px;
+        pointer-events: none;
+    }
 
-        .link { /* this styles the links connecting the nodes */
-            stroke: #999;
-            stroke-opacity: 0.6;
-        }
+    .link { /* this styles the links connecting the nodes */
+        stroke: #999;
+        stroke-opacity: 0.6;
+    }
 
-        .loading { /* styles the loading message */
-            font-style: italic;
-            color: gray;
-        }
+    .loading { /* styles the loading message */
+        font-style: italic;
+        color: gray;
+    }
 
-        .tooltip { /* styles the tooltip */
-            position: absolute;
-            background: white;
-            border: 1px solid gray;
-            padding: 5px;
-            border-radius: 4px;
-            pointer-events: none;
-            font-size: 14px;
-            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
-        }
+    .tooltip { /* styles the tooltip */
+        position: absolute;
+        background: white;
+        border: 1px solid gray;
+        padding: 5px;
+        border-radius: 4px;
+        pointer-events: none;
+        font-size: 14px;
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+    }
 
-        textarea { /* styling for the textboxes */
-            font-family: 'Roboto', sans-serif;
-            font-size: 16px;
-            text-align: left;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            resize: none;
-            width: 100%;
-            box-sizing: border-box;
-            white-space: pre-wrap;
-        }
+    textarea { /* styling for the textboxes */
+        font-family: 'Roboto', sans-serif;
+        font-size: 16px;
+        text-align: left;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        resize: none;
+        width: 100%;
+        box-sizing: border-box;
+        white-space: pre-wrap;
+    }
 
-        #textbox1, #textbox2 {
-            max-width: 600px; /* Limit the maximum width */
-            height: 100px; /* Adjust the height for better readability */
-        }
+    #textbox1, #textbox2 {
+        max-width: 600px; /* Limit the maximum width */
+        height: 100px; /* Adjust the height for better readability */
+    }
 
-        nav { /* styles the navigation bar */
-            background-color: white;
-            width: 100%;
-            padding: 10px;
-            text-align: center;
-            border-bottom: 2px solid #ccc;
-        }
+    nav { /* styles the navigation bar */
+        background-color: white;
+        width: 100%;
+        padding: 10px;
+        text-align: center;
+        border-bottom: 2px solid #ccc;
+    }
 
-        nav a { /* styles the navigation's text */
-            padding: 10px 20px;
-            text-decoration: none;
-            color: black;
-            font-weight: bold;
-        }
+    nav a { /* styles the navigation's text */
+        padding: 10px 20px;
+        text-decoration: none;
+        color: black;
+        font-weight: bold;
+    }
 
-        /* styling for About Us section */
-        #parkinsons, #aboutUs {
-            padding: 20px;
-            background-color: white;
-            border: 1px solid #ccc;
-            margin-top: 20px;
-            position: fixed; /* fix to cover the whole page */
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 10; /* ensure it overlays the network */
-            overflow: auto;
-        }
-        
-        /* styling for the Parkinson's Disease Information section */
-        #parkinsons {
-            display: none;
-            padding: 20px;
-            background-color: white;
-            border: 1px solid #ccc;
-            margin-top: 20px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 10;
-            overflow: auto;
-        }
+    /* styling for About Us section */
+    #parkinsons, #aboutUs {
+        padding: 20px;
+        background-color: white;
+        border: 1px solid #ccc;
+        margin-top: 20px;
+        position: fixed; /* fix to cover the whole page */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 10; /* ensure it overlays the network */
+        overflow: auto;
+    }
 
-        #parkinsons button {
-            padding: 10px 20px;
-            background-color: #f0f0f0;
-            border: 1px solid #ccc;
-            font-weight: bold;
-            cursor: pointer;
-        }
+    /* styling for the Parkinson's Disease Information section */
+    #parkinsons {
+        display: none;
+        padding: 20px;
+        background-color: white;
+        border: 1px solid #ccc;
+        margin-top: 20px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 10;
+        overflow: auto;
+    }
 
-        #parkinsons h2 {
-            font-size: 23px;
-            line-height: 1.5;
-        }
+    #parkinsons button {
+        padding: 10px 20px;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        font-weight: bold;
+        cursor: pointer;
+    }
 
-        #parkinsons p,
-        #parkinsons em,
-        #parkinsons ul {
-            font-size: 18px;
-            line-height: 1.8;
-        }
+    #parkinsons h2 {
+        font-size: 23px;
+        line-height: 1.5;
+    }
 
-        #parkinsons ul ul {
-            margin-left: 18px;
-        }
+    #parkinsons p,
+    #parkinsons em,
+    #parkinsons ul {
+        font-size: 18px;
+        line-height: 1.8;
+    }
 
-        #textbox1 {
-            display: none; /* initially hide the textbox */
-            font-family: 'Roboto', sans-serif;
-            font-size: 16px;
-            text-align: left;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            resize: none;
-            width: 100%;
-            box-sizing: border-box;
-            white-space: pre-wrap;
-        }
+    #parkinsons ul ul {
+        margin-left: 18px;
+    }
 
-        #legend {  /* styling for the legend */
-            display: inline-block;
-            vertical-align: top;
-            width: 15%;
-            height: 90vh;
-            padding: 20px;
-            background-color: #fff;
-            border: 1px solid #ccc;
-            margin-left: 20px;
-            box-sizing: border-box;
-        }
+    #textbox1 {
+        display: none; /* initially hide the textbox */
+        font-family: 'Roboto', sans-serif;
+        font-size: 16px;
+        text-align: left;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        resize: none;
+        width: 100%;
+        box-sizing: border-box;
+        white-space: pre-wrap;
+    }
 
-        .legend-item { /* styling the legend icons */
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
+    #legend {  /* styling for the legend */
+        display: inline-block;
+        vertical-align: top;
+        width: 15%;
+        height: 90vh;
+        padding: 20px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        margin-left: 20px;
+        box-sizing: border-box;
+    }
 
-        .legend-color { /* styling the legend colors */
-            width: 20px;
-            height: 20px;
-            border-radius: 50%; /* this makes the legend icons circular */
-            margin-right: 10px;
-        }
+    .legend-item { /* styling the legend icons */
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .legend-color { /* styling the legend colors */
+        width: 20px;
+        height: 20px;
+        border-radius: 50%; /* this makes the legend icons circular */
+        margin-right: 10px;
+    }
     </style>
 </head>
 
-<body>
+<body> <!-- HTML part -->
 
 <h1>Dopaminergic Pathways of the Drugs Used to Treat Parkinson's Disease 🧠 &#128138;</h1>
 <div style="background-color: white; width: 100%; padding: 10px; text-align: center; border-bottom: 2px solid #ccc;">
@@ -271,7 +271,7 @@
 
 <div class="tooltip" style="opacity: 0;"></div>
 
-<script>
+<script> // JavaScript part
     function showParkinsonsInfo() {
         // hide all other textboxes when clicking Parkinson's Disease Information
         document.getElementById('textbox1').style.display = 'none';
@@ -520,7 +520,7 @@ WHERE {
 
 
 
-                    .on("mouseout", () => tooltip.style("opacity", 0))
+                .on("mouseout", () => tooltip.style("opacity", 0))
                 .on("click", (event, d) => {
                     const selectedNodeId = d.id;
                     const isAgonist = selectedNodeId.includes('_agonist');
