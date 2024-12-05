@@ -5,13 +5,13 @@
     <meta charset="UTF-8">
     <title>Dopaminergic Dynamics - Interactive Network</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <style> /* this section of the code styles the website with color, font etc (CSS) */
-    body { /* here, the body section is styled */
+    <style> /* this section of the code styles the website with color, font etc (CSS part) */
+    body { /* this styles the body section */
         background-color: whitesmoke;
         font-family: 'Optima', sans-serif;
     }
 
-    h1 { /* here, the page header is styled*/
+    h1 { /* this styles the page header */
         color: black;
         text-align: left;
         background-color: lightpink;
@@ -19,7 +19,7 @@
         border-radius: 8px;
     }
 
-    #network { /* here, it styles the network container */
+    #network { /* this styles the network container */
         width: 80%;
         height: 90vh;
         border: 1px solid #ccc;
@@ -41,12 +41,12 @@
         stroke-opacity: 0.6;
     }
 
-    .loading { /* styles the loading message */
+    .loading { /* this styles the loading message */
         font-style: italic;
         color: gray;
     }
 
-    .tooltip { /* styles the tooltip */
+    .tooltip { /* this styles the tooltip */
         position: absolute;
         background: white;
         border: 1px solid gray;
@@ -57,25 +57,7 @@
         box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
     }
 
-    textarea { /* styling for the textboxes */
-        font-family: 'Roboto', sans-serif;
-        font-size: 16px;
-        text-align: left;
-        padding: 10px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-        resize: none;
-        width: 100%;
-        box-sizing: border-box;
-        white-space: pre-wrap;
-    }
-
-    #textbox1, #textbox2 {
-        max-width: 600px; /* Limit the maximum width */
-        height: 100px; /* Adjust the height for better readability */
-    }
-
-    nav { /* styles the navigation bar */
+    nav { /* this styles the navigation bar */
         background-color: white;
         width: 100%;
         padding: 10px;
@@ -83,15 +65,15 @@
         border-bottom: 2px solid #ccc;
     }
 
-    nav a { /* styles the navigation's text */
+    nav a { /* this styles the navigation's text */
         padding: 10px 20px;
         text-decoration: none;
         color: black;
         font-weight: bold;
     }
 
-    /* styling for About Us section */
-    #parkinsons, #aboutUs {
+    /* styling the About Us section */
+    #aboutUs {
         padding: 20px;
         background-color: white;
         border: 1px solid #ccc;
@@ -105,7 +87,7 @@
         overflow: auto;
     }
 
-    /* styling for the Parkinson's Disease Information section */
+    /* styling the Parkinson's Disease Information section */
     #parkinsons {
         display: none;
         padding: 20px;
@@ -145,21 +127,7 @@
         margin-left: 18px;
     }
 
-    #textbox1 {
-        display: none; /* initially hide the textbox */
-        font-family: 'Roboto', sans-serif;
-        font-size: 16px;
-        text-align: left;
-        padding: 10px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-        resize: none;
-        width: 100%;
-        box-sizing: border-box;
-        white-space: pre-wrap;
-    }
-
-    #legend {  /* styling for the legend */
+    #legend {  /* styling the legend */
         display: inline-block;
         vertical-align: top;
         width: 15%;
@@ -243,9 +211,6 @@
     </p>
 </div>
 
-<!-- textbox for authors -->
-<textarea id="textbox1" readonly>Authors: Anna Pihlakas, Léa Kremers, Sophie Parsons, Renee Carr</textarea>
-
 <div id="network" class="loading"></div>
 
 <!-- legend Section -->
@@ -273,8 +238,6 @@
 
 <script> // JavaScript part
     function showParkinsonsInfo() {
-        // hide all other textboxes when clicking Parkinson's Disease Information
-        document.getElementById('textbox1').style.display = 'none';
 
         // show the Parkinson's Disease Information section and cover the entire page
         document.getElementById('parkinsons').style.display = 'block';
@@ -518,8 +481,6 @@ WHERE {
                     }
                 })
 
-
-
                 .on("mouseout", () => tooltip.style("opacity", 0))
                 .on("click", (event, d) => {
                     const selectedNodeId = d.id;
@@ -557,7 +518,6 @@ WHERE {
                             return isLinkToSelected || isLinkToCounterpart ? 4 : 2;  // thicker for highlighted links
                         });
                 });
-
 
             node.append("text")
                 .text(d => d.id.replace(/_agonist|_antagonist$/, ''))  // this removes the "_agonist" or "_antagonist" suffix
