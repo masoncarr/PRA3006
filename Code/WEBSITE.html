@@ -259,7 +259,7 @@
     document.addEventListener("DOMContentLoaded", () => {
         const sparqlEndpoint = "https://query.wikidata.org/sparql"; // SPARQL endpoint to query Wikidata
         const sparqlQuery = `
-SELECT ?item ?itemLabel ?receptorLabel ?roleLabel ?diseaseLabel ?structureLabel ?bnsLabel ?formulaLabel
+SELECT ?item ?itemLabel ?receptorLabel ?roleLabel ?diseaseLabel ?structureLabel ?bnsLabel ?formulaLabel ?pubchemLabel
 WHERE {
   # Setting ?receptor as dopamine receptors D1-D5
   VALUES ?receptor {
@@ -289,6 +289,7 @@ WHERE {
   OPTIONAL {?item wdt:P117 ?structure.}
   OPTIONAL {?item wdt:P8224 ?bns.}
   OPTIONAL {?item wdt:P274 ?formula.}
+  OPTIONAL {?item wdt:P662 ?pubchem.}
 
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en".}
 }
@@ -320,6 +321,7 @@ WHERE {
                     const structureLabel = result.structureLabel?.value || 'No structure available';
                     const bnsLabel = result.bnsLabel?.value || 'No ball-and-stick model available';
                     const formulaLabel = result.formulaLabel?.value || 'No formula available';
+                    const pubchemLabel = result.pubchemLabel?.value || 'No CID available';
 
                     // check if drug already exists in the nodes array for the specific role (agonist or antagonist)
                     const drugNodeId = role === 'agonist' ? `${drug}_agonist` : role === 'antagonist' ? `${drug}_antagonist` : drug;
@@ -332,7 +334,8 @@ WHERE {
                             role: role,
                             structureLabel: structureLabel,
                             bnsLabel: bnsLabel,
-                            formulaLabel: formulaLabel
+                            formulaLabel: formulaLabel,
+                            pubchemLabel: pubchemLabel
                         });
                     }
 
@@ -461,6 +464,7 @@ WHERE {
                     // default values for structure and ball-and-stick image validity
                     const structureValid = d.structureLabel ? await checkImageValid(d.structureLabel) : false;
                     const bnsValid = d.bnsLabel ? await checkImageValid(d.bnsLabel) : false;
+                    const testString = "test";
 
                     if (d.group === 1) {  // only show tooltip for drug nodes
                         tooltip.style("opacity", 1)
@@ -468,7 +472,8 @@ WHERE {
                                 <strong>${d.id.replace(/_agonist|_antagonist$/, '')}</strong><br>
                                 <strong>Structure:</strong> ${structureValid ? `<img src="${d.structureLabel}" alt="Structure Image" style="max-width: 150px; height: auto;"><br>` : 'No structure available<br>'}
                                 <strong>Ball-and-Stick Model:</strong> ${bnsValid ? `<img src="${d.bnsLabel}" alt="Ball-and-Stick Model" style="max-width: 150px; height: auto;"><br>` : 'No ball-and-stick model available<br>'}
-                                <strong>Formula:</strong> ${d.formulaLabel}
+                                <strong>Formula:</strong> ${d.formulaLabel}<br>
+                                <strong>Pubchem CID:</strong> ${d.pubchemLabel}
                                 `)
                             .style("left", (event.pageX + 10) + "px")
                             .style("top", (event.pageY - 10) + "px");
