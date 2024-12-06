@@ -54,7 +54,7 @@
         border-radius: 4px;
         pointer-events: none;
         font-size: 14px;
-        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
     nav { /* this styles the navigation bar */
@@ -317,7 +317,7 @@ WHERE {
                     const role = result.roleLabel?.value || 'Unknown Role';
                     const disease = result.diseaseLabel?.value || 'Parkinson\'s Disease';
 
-                    // extract additional data (structure, ball-and-stick model, formula)
+                    // extract additional data (structure, ball-and-stick model, formula, pubchem CID)
                     const structureLabel = result.structureLabel?.value || 'No structure available';
                     const bnsLabel = result.bnsLabel?.value || 'No ball-and-stick model available';
                     const formulaLabel = result.formulaLabel?.value || 'No formula available';
@@ -464,7 +464,6 @@ WHERE {
                     // default values for structure and ball-and-stick image validity
                     const structureValid = d.structureLabel ? await checkImageValid(d.structureLabel) : false;
                     const bnsValid = d.bnsLabel ? await checkImageValid(d.bnsLabel) : false;
-                    const testString = "test";
 
                     if (d.group === 1) {  // only show tooltip for drug nodes
                         tooltip.style("opacity", 1)
